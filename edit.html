@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>编辑报表 - Mini-Report</title>
     <link rel="stylesheet" href="themes/default/easyui.css">
     <link rel="stylesheet" href="themes/icon.css">
     <style type="text/css">
@@ -18,6 +19,10 @@
     }
     span.form-tip {
         color: gray;
+    }
+    #editor {
+        width: 100%;
+        height: 450px;;
     }
     </style>
   </head>
@@ -84,6 +89,140 @@
       </div>
 
       <div title="存储过程">
+        <div id="editor">
+drop table if exists tommy_oto_coor_comm_temp;
+create table tommy_oto_coor_comm_temp as
+select DATE_SUB(CURDATE(),INTERVAL 1 day) log_dt,
+       fx_id,
+       comm_id
+ from dw_db.dw_nh_fx_info
+where fx_status = 1 and is_display = 0;
+
+
+drop table if exists tommy_oto_ppc_broker_temp;
+create table tommy_oto_ppc_broker_temp
+select distinct broker_id from dw_db.dw_ajk_ppc_broker_daily_sd
+where cal_dt >= DATE_SUB(CURDATE(),INTERVAL 7 day) and pm_prop>=1
+and city_id= 11;
+
+
+create index broker_id on tommy_oto_ppc_broker_temp(broker_id);
+
+
+drop table if exists tommy_oto_coor_company_temp;
+create table tommy_oto_coor_company_temp as
+select distinct
+       d.subregion_name,
+       d.region_name,
+       a.company_id,
+       a.Stores_id,
+       a.broker_id,
+       case when e.broker_id is null then 0 else 1 end is_ppc
+ from dw_db.dw_broker a
+join dw_db.dw_nh_fx_company_user b on a.company_id = b.company_id
+left join dw_db.dw_region_lkp d on a.subregion_id=d.subregion_id
+left join tommy_oto_ppc_broker_temp e on a.broker_id = e.broker_id
+where a.is_valid =1 and b.status = 1;
+
+
+drop table if exists tommy_oto_coor_apply_temp;
+create table tommy_oto_coor_apply_temp as
+select fx_id,comm_id,count(distinct broker_id) broker_nbr
+from dw_db.dw_nh_fx_apply
+where status = 1
+group by 1,2;
+
+
+drop table if exists tommy_oto_coor_process_temp;
+create table tommy_oto_coor_process_temp as
+select fix_id,
+       comm_id,
+       count(distinct case when status1_dt!='1970-01-01' then broker_id end) broker_nbr1,
+       count(distinct case when status2_dt!='1970-01-01' then broker_id end) broker_nbr2,
+       count(distinct case when status3_dt!='1970-01-01' then broker_id end) broker_nbr3,
+       count(distinct case when status4_dt!='1970-01-01' then broker_id end) broker_nbr4,
+       count(case when status1_dt!='1970-01-01' then broker_id end) broker_nbr1_c,
+       count(case when status2_dt!='1970-01-01' then broker_id end) broker_nbr2_c,
+       count(case when status3_dt!='1970-01-01' then broker_id end) broker_nbr3_c,
+       count(case when status4_dt!='1970-01-01' then broker_id end) broker_nbr4_c
+ from dw_db.dw_nh_fx_customer
+group by 1,2;
+
+
+
+
+drop table if exists tommy_oto_coor_fianl_temp;
+create table tommy_oto_coor_fianl_temp as
+select log_dt,
+       a.fx_id,
+       d.comm_id,
+       d.comm_name_nh,
+       d.district_name region_name,
+       d.block_name subregion_name,
+       sum(b.broker_nbr) apply_broker_nbr,
+       sum(c.broker_nbr1) order_broker_nbr,
+       sum(c.broker_nbr2) see_broker_nbr,
+       sum(c.broker_nbr3) swipe_broker_nbr,
+       sum(c.broker_nbr4) deal_broker_nbr
+from tommy_oto_coor_comm_temp a
+join tommy_oto_coor_apply_temp b on a.fx_id = b.fx_id
+join tommy_oto_coor_process_temp c on a.fx_id = c.fix_id
+left join dw_db_test.tommy_msc_af_comm_extend_final d on a.comm_id = d.comm_id
+group by 1,2,3,4;
+
+
+
+drop table if exists tommy_oto_coor_fianl1;
+create table tommy_oto_coor_fianl1 as
+select a.log_dt,
+       fx_id,
+       comm_id,
+       comm_name_nh,
+       a.region_name,
+       a.subregion_name,
+       apply_broker_nbr,
+       order_broker_nbr,
+       see_broker_nbr,
+       swipe_broker_nbr,
+       deal_broker_nbr,
+       count(distinct company_id) company_nbr,
+       count(distinct broker_id) broker_nbr_total,
+       count(distinct case when is_ppc=1 then broker_id end) ppc_broker_nbr_total,
+       count(distinct case when a.region_name = b.region_name and is_ppc=1  then broker_id end) same_region_ppc_broker_nbr
+from tommy_oto_coor_fianl_temp a,tommy_oto_coor_company_temp b
+group by 1,2,3,4,5,6,7,8,9,10,11;
+
+drop table if exists tommy_otp_billing_temp;
+create table tommy_otp_billing_temp as
+select fx_id,sum(amount) amount from  dw_db.dw_nh_fx_commission_billing
+group by 1;
+
+
+drop table if exists tommy_oto_coor_fianl2;
+create table tommy_oto_coor_fianl2 as
+select log_dt,
+       a.fx_id,
+       comm_id,
+       comm_name_nh,
+       company_nbr,
+       broker_nbr_total,
+       ppc_broker_nbr_total,
+       same_region_ppc_broker_nbr,
+       a.region_name,
+       a.subregion_name,
+       apply_broker_nbr,
+       order_broker_nbr,
+       see_broker_nbr,
+       swipe_broker_nbr,
+       deal_broker_nbr,
+       b.amount
+from tommy_oto_coor_fianl1 a
+left join tommy_otp_billing_temp b on a.fx_id = b.fx_id;
+        </div>
+        <div style="padding: 10px;">
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save'">保存</a>
+        <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo'" style="margin-left: 10px;">运行</a>
+        </div>
       </div>
 
       <div title="报表设计">
@@ -92,5 +231,10 @@
 
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="js/ace/ace.js"></script>
+    <script type="text/javascript">
+        var editor = ace.edit('editor');
+        editor.getSession().setMode('ace/mode/sql');
+    </script>
   </body>
 </html>
