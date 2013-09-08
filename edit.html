@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <link rel="stylesheet" href="themes/default/easyui.css">
+    <link rel="stylesheet" href="themes/icon.css">
+    <style type="text/css">
+    table.report-form th {
+        font-weight: normal;
+        text-align: right;
+    }
+    table.report-form td {
+        padding: 5px 0;
+    }
+    table.report-form th.align-top {
+        vertical-align: top;
+        padding-top: 8px;
+    }
+    span.form-tip {
+        color: gray;
+    }
+    </style>
+  </head>
+  <body>
+    <h3>编辑报表</h3>
+
+    <div class="easyui-tabs" data-options="tabPosition:'left'" style="width: 768px; height: 500px;">
+      <div title="基本信息" style="padding: 10px;">
+      <table class="report-form">
+        <tr>
+          <th>报表名称：</th>
+          <td><input type="text" value="分销每日数据"></td>
+        </tr>
+        <tr>
+          <th>状态：</th>
+          <td>
+            <label><input type="radio" name="status" checked="checked"> 草稿</label>
+            <label><input type="radio" name="status"> 有效</label>
+            <label><input type="radio" name="status"> 暂停</label>
+          </td>
+        </tr>
+        <tr>
+          <th>创建人：</th>
+          <td>
+            <select class="easyui-combobox" style="width: 80px;">
+              <option>郑浩</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>运行时间：</th>
+          <td>
+            <select class="easyui-combobox" data-options="editable:false,panelHeight:'auto'">
+              <option>每天</option>
+              <option>每周</option>
+            </select>
+            <input type="text" value="09:00">
+          </td>
+        </tr>
+        <tr>
+          <th>邮件标题：</th>
+          <td>
+            <input type="text" value="分销每日数据 ${date}">
+            <span class="form-tip">示例：分销每日数据 2013-09-08</span>
+          </td>
+        </tr>
+        <tr>
+          <th class="align-top">收件人：</th>
+          <td>
+            <div>
+            <select multiple="multiple" style="float: left; margin: 0 10px 10px 0;">
+              <option>dl-data-au@anjuke.com</option>
+              <option>dl-data-bu@anjuke.com</option>
+            </select>
+            <a href="#" class="easyui-linkbutton">删除</a>
+            </div>
+            <div style="clear: both;">
+            <input type="text" value="haozheng@anjuke.com" style="margin-right: 10px;">
+            <a href="#" class="easyui-linkbutton">添加</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+      </div>
+
+      <div title="存储过程">
+      </div>
+
+      <div title="报表设计">
+      </div>
+    </div>
+
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+  </body>
+</html>
