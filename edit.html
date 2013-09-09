@@ -20,9 +20,37 @@
     span.form-tip {
         color: gray;
     }
-    #editor {
-        width: 100%;
-        height: 450px;;
+    ul.field-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    ul.field-list li {
+        margin: 0;
+        padding: 0;
+    }
+    ul.field-list a {
+        display: block;
+        padding: 3px 5px;
+        text-decoration: none;
+        color: black;
+    }
+    ul.field-list a:hover {
+        background-color: #ddd;
+    }
+    .mini-textbox {
+        border: 1px solid #95B8E7;
+        padding: 1px 0 2px 0;
+        vertical-align: middle;
+    }
+    .mini-checkbox {
+        vertical-align: middle;
+    }
+    .mini-radio {
+        vertical-align: text-bottom;
+    }
+    .mini-multiselect {
+        border: 1px solid #95B8E7;
     }
     </style>
   </head>
@@ -34,14 +62,14 @@
       <table class="report-form">
         <tr>
           <th>报表名称：</th>
-          <td><input type="text" value="分销每日数据"></td>
+          <td><input type="text" value="分销每日数据" class="mini-textbox"></td>
         </tr>
         <tr>
           <th>状态：</th>
           <td>
-            <label><input type="radio" name="status" checked="checked"> 草稿</label>
-            <label><input type="radio" name="status"> 有效</label>
-            <label><input type="radio" name="status"> 暂停</label>
+            <label><input type="radio" name="status" checked="checked" class="mini-radio"> 草稿</label>
+            <label><input type="radio" name="status" class="mini-radio"> 有效</label>
+            <label><input type="radio" name="status" class="mini-radio"> 暂停</label>
           </td>
         </tr>
         <tr>
@@ -59,13 +87,13 @@
               <option>每天</option>
               <option>每周</option>
             </select>
-            <input type="text" value="09:00">
+            <input type="text" value="09:00" class="mini-textbox">
           </td>
         </tr>
         <tr>
           <th>邮件标题：</th>
           <td>
-            <input type="text" value="分销每日数据 ${date}">
+            <input type="text" value="分销每日数据 ${date}" class="mini-textbox">
             <span class="form-tip">示例：分销每日数据 2013-09-08</span>
           </td>
         </tr>
@@ -73,14 +101,14 @@
           <th class="align-top">收件人：</th>
           <td>
             <div>
-            <select multiple="multiple" style="float: left; margin: 0 10px 10px 0;">
+            <select multiple="multiple" style="float: left; margin: 0 10px 10px 0;" class="mini-multiselect">
               <option>dl-data-au@anjuke.com</option>
               <option>dl-data-bu@anjuke.com</option>
             </select>
             <a href="#" class="easyui-linkbutton">删除</a>
             </div>
             <div style="clear: both;">
-            <input type="text" value="haozheng@anjuke.com" style="margin-right: 10px;">
+            <input type="text" value="haozheng@anjuke.com" style="margin-right: 10px;" class="mini-textbox">
             <a href="#" class="easyui-linkbutton">添加</a>
             </div>
           </td>
@@ -89,7 +117,7 @@
       </div>
 
       <div title="存储过程">
-        <div id="editor">
+        <div id="editor" style="height: 450px;">
 drop table if exists tommy_oto_coor_comm_temp;
 create table tommy_oto_coor_comm_temp as
 select DATE_SUB(CURDATE(),INTERVAL 1 day) log_dt,
@@ -225,8 +253,163 @@ left join tommy_otp_billing_temp b on a.fx_id = b.fx_id;
         </div>
       </div>
 
-      <div title="报表设计">
+      <div title="设计报表1" data-options="selected:true,tools:'#p-tools1'">
+
+      <div style="margin: 10px;">
+      子报表名称： <input type="text" value="分销每日数据 ${date}" class="mini-textbox">
       </div>
+
+      <div style="margin: 10px; height: 400px;">
+        <div class="easyui-tabs" data-options="fit:true,plain:true">
+          <div title="查询语句" style="padding:10px;">
+            <div id="sqlEditor" style="height: 100px;">
+select log_dt, fx_id, comm_id, comm_name_nh
+from tommy_oto_coor_fianl2
+where log_dt between curdate() - interval 7 day and curdate()
+            </div>
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-redo'" style="margin-left: 10px;">运行</a>
+            <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="margin: 10px 0;">更新字段</a>
+
+            <table class="easyui-datagrid" style="height: auto;" data-options="rownumbers:true,singleSelect:true">
+            <thead>
+              <tr>
+                <th data-options="field:'log_dt'">log_dt</th>
+                <th data-options="field:'fx_id'">fx_id</th>
+                <th data-options="field:'comm_id'">comm_id</th>
+                <th data-options="field:'comm_name_nh'">comm_name_nh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2013-09-02</td>
+                <td>2885</td>
+                <td>241021</td>
+                <td>远洋7号</td>
+              </tr>
+              <tr>
+                <td>2013-09-03</td>
+                <td>2885</td>
+                <td>241021</td>
+                <td>远洋7号</td>
+              </tr>
+              <tr>
+                <td>2013-09-04</td>
+                <td>2885</td>
+                <td>241021</td>
+                <td>远洋7号</td>
+              </tr>
+            </tbody>
+            </table>
+
+          </div>
+          <div title="字段设计" style="padding:10px;" data-options="selected:true">
+
+            <div class="easyui-layout" data-options="fit:true">
+
+            <div data-options="region:'west',split:true" style="width:120px;">
+              <ul class="field-list">
+                <li><a href="#" style="background-color: silver;">log_dt</a></li>
+                <li><a href="#">fx_id</a></li>
+                <li><a href="#">comm_id</a></li>
+                <li><a href="#">comm_name_nh</a></li>
+              </ul>
+            </div>
+
+            <div data-options="region:'center'" style="padding: 5px">
+            <table class="report-form">
+              <tr>
+                <th>显示名称：</th>
+                <td><input type="text" value="日期" class="mini-textbox"></td>
+              </tr>
+              <tr>
+                <th>格式化：</th>
+                <td>
+                  <select class="easyui-combobox" data-options="editable:false,panelHeight:'auto'">
+                    <option>常规</option>
+                    <option selected="selected">数值</option>
+                    <option>百分比</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <th>小数位数：</th>
+                <td>
+                  <input type="text" class="easyui-numberspinner" value="2" style="width: 40px;"></input>
+                  <label>
+                    <input type="checkbox" class="mini-checkbox"> 使用千分位符
+                  </label>
+                </td>
+              </tr>
+              <tr>
+                <th>负数格式：</th>
+                <td>
+                  <select class="easyui-combobox" data-options="editable:false,panelHeight:'auto'">
+                    <option>(1234.10)</option>
+                    <option selected="selected">-1234.10</option>
+                  </select>
+                </td>
+              </tr>
+              <tr>
+                <th>对齐：</th>
+                <td>
+                  <label><input type="radio" name="alignment" checked="checked" class="mini-radio"> 居左</label>
+                  <label><input type="radio" name="alignment" class="mini-radio"> 居中</label>
+                  <label><input type="radio" name="alignment" class="mini-radio"> 居右</label>
+                </td>
+              </tr>
+              <tr>
+                <th class="align-top">高亮规则：</th>
+                <td>
+                  <div style="margin-bottom: 5px;">
+                  <select class="easyui-combobox" data-options="editable:false,panelHeight:'auto'">
+                    <option selected="selected">大于</option>
+                    <option>等于</option>
+                    <option>小于</option>
+                  </select>
+                  <input type="text" class="mini-textbox" value="100" style="width: 60px;">
+                  &nbsp;&nbsp;格式：
+                  <select class="easyui-combobox" data-options="editable:false,panelHeight:'auto'">
+                    <option>粗体</option>
+                    <option selected="selected">红色</option>
+                    <option>绿色</option>
+                  </select>
+                  </div>
+                  <div style="margin-bottom: 5px;">
+                  <select class="easyui-combobox" data-options="editable:false,panelHeight:'auto'">
+                    <option>大于</option>
+                    <option>等于</option>
+                    <option selected="selected">小于</option>
+                  </select>
+                  <input type="text" class="mini-textbox" value="20" style="width: 60px;">
+                  &nbsp;&nbsp;格式：
+                  <select class="easyui-combobox" data-options="editable:false,panelHeight:'auto'">
+                    <option>粗体</option>
+                    <option>红色</option>
+                    <option selected="selected">绿色</option>
+                  </select>
+                  </div>
+                </td>
+              </tr>
+            </table>
+            </div>
+
+            </div>
+          </div>
+          <div title="表格样式" style="padding:10px;"></div>
+          <div title="预览" style="padding: 10px;"></div>
+        </div>
+      </div>
+
+      </div>
+
+      <div title="设计报表2" data-options="tools:'#p-tools2'"></div>
+    </div>
+
+    <div id="p-tools1">
+        <a href="javascript:void(0)" class="icon-mini-add"></a>
+    </div>
+    <div id="p-tools2">
+        <a href="javascript:void(0)" class="icon-mini-add"></a>
     </div>
 
     <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -235,6 +418,17 @@ left join tommy_otp_billing_temp b on a.fx_id = b.fx_id;
     <script type="text/javascript">
         var editor = ace.edit('editor');
         editor.getSession().setMode('ace/mode/sql');
+
+        var toolbar = [{
+            text:'新增',
+            iconCls:'icon-add',
+        },{
+            text:'删除',
+            iconCls:'icon-cancel'
+        }];
+
+        var sqlEditor = ace.edit('sqlEditor');
+        sqlEditor.getSession().setMode('ace/mode/sql');
     </script>
   </body>
 </html>
