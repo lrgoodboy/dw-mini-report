@@ -7,8 +7,8 @@
 
 <div class="row">
   <div class="span12" style="font-size: 14px;">
-    <div class="alert alert-error">
-      <strong>操作失败！</strong>${error}
+    <div class="alert alert-success">
+      <strong>退订成功！</strong>如需重新订阅，请联系<a href="mailto:dl-data@anjuke.com">dl-data@anjuke.com</a>。
     </div>
   </div>
 </div>
