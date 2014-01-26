@@ -11,12 +11,14 @@
         location="classpath:spring/datasource.properties,classpath:override/spring/datasource.properties"
         ignore-resource-not-found="true" />
 
-    <bean id="dwStageDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+    <bean id="dwMonitorDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
         destroy-method="close" p:driverClass="${jdbc.driverClassName}"
-        p:jdbcUrl="${jdbc.dw_stage.url}" p:user="${jdbc.dw_stage.username}"
-        p:password="${jdbc.dw_stage.password}" p:initialPoolSize="0"
+        p:jdbcUrl="${jdbc.dw_monitor.url}" p:user="${jdbc.dw_monitor.username}"
+        p:password="${jdbc.dw_monitor.password}" p:initialPoolSize="0"
         p:minPoolSize="0" p:maxPoolSize="2" p:acquireIncrement="1"
         p:idleConnectionTestPeriod="300" p:testConnectionOnCheckin="true"
         p:preferredTestQuery="SELECT 1" />
+
+    <bean id="reportDao" class="com.anjuke.dw.mini.dao.ReportDao" p:dataSource-ref="dwMonitorDataSource" />
 
 </beans>

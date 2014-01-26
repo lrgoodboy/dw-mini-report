@@ -8,10 +8,6 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title>Mini-Report</title>
     <link href="<c:url value="/webjars/bootstrap/2.3.2/css/bootstrap.min.css" />" rel="stylesheet">
-    <!--
-    <link href="<c:url value="/webjars/bootstrap/2.3.2/css/bootstrap-responsive.min.css" />" rel="stylesheet">
-    -->
-    <link href="<c:url value="/resources/css/base.css" />" rel="stylesheet">
     <jsp:invoke fragment="styles"/>
   </head>
   <body>
