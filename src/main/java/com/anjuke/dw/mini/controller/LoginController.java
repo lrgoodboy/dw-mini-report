@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
-
 import net.sf.json.JSONObject;
 
 import org.apache.http.NameValuePair;
@@ -34,9 +32,6 @@ import com.anjuke.dw.mini.model.AnjukeUser;
 @Controller
 @SessionAttributes({"currentUser", "loginFrom"})
 public class LoginController {
-
-    @Autowired
-    private ServletContext servletContext;
 
     @Autowired
     @Qualifier("commonProperties")
@@ -100,15 +95,18 @@ public class LoginController {
             return redirect;
         }
 
+        if (from == null) {
+            redirect.setUrl("http://max.corp.anjuke.com");
+            return redirect;
+        }
+        model.addAttribute("loginFrom", from);
+
         redirect.setUrl(UriComponentsBuilder
-                .fromHttpUrl(commonProperties.getProperty("oauth.url"))
+                .fromHttpUrl(oauthUrl)
                 .path("/authorize.php")
-                .queryParam("client_id", commonProperties.getProperty("oauth.client"))
+                .queryParam("client_id", oauthClient)
                 .queryParam("response_type", "code")
                 .build().toUriString());
-
-        model.addAttribute("loginFrom", from == null ? servletContext.getContextPath() : from);
-
         return redirect;
     }
 
