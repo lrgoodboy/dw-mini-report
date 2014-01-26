@@ -45,6 +45,7 @@ public class LoginController {
 
         RedirectView redirect = new RedirectView();
         redirect.setStatusCode(HttpStatus.FOUND);
+        redirect.setExposeModelAttributes(false);
 
         String oauthUrl = commonProperties.getProperty("oauth.url");
         String oauthClient = commonProperties.getProperty("oauth.client");
