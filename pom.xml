@@ -5,7 +5,7 @@
     <groupId>com.anjuke.dw</groupId>
     <artifactId>dw-mini-report</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>dw-mini-report</name>
     <url>http://dwms.corp.anjuke.com/mini</url>
